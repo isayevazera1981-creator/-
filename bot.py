@@ -8,7 +8,7 @@ from telebot import types
 # Для мгновенного вывода логов в консоль
 sys.stdout.reconfigure(line_buffering=True)
 
-TOKEN = "9128067113:AAGwO4mQvg-NNjXrGs2xyklZur0h8ZdmvJI"
+TOKEN = os.environ.get("BOT_TOKEN", "9128067113:AAGwO4mQvg-NNjXrGs2xyklZur0h8ZdmvJI")
 
 bot = telebot.TeleBot(TOKEN)
 
