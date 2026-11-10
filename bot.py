@@ -1,4 +1,7 @@
+import os
 import sys
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
 import telebot
 from telebot import types
 
@@ -114,6 +117,26 @@ def handle_plan(message):
     )
     bot.send_message(message.chat.id, text, parse_mode="Markdown")
 
+# Мини веб-сервер для бесплатного тарифа Render (Web Service)
+class HealthCheckHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-type", "text/plain; charset=utf-8")
+        self.end_headers()
+        self.wfile.write(b"Telegram Bot is running!")
+
+    def log_message(self, format, *args):
+        pass  # Отключаем лишний спам в логах веб-сервера
+
+def start_web_server():
+    port = int(os.environ.get("PORT", 8080))
+    server = HTTPServer(("0.0.0.0", port), HealthCheckHandler)
+    server.serve_forever()
+
 if __name__ == '__main__':
+    # Запускаем фоновый веб-сервер для Render
+    web_thread = threading.Thread(target=start_web_server, daemon=True)
+    web_thread.start()
+    
     print("Бот успешно запущен и ожидает сообщений...")
     bot.infinity_polling()
